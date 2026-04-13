@@ -1099,18 +1099,24 @@ function startRaceAfterQualifying() {
     if (gridStartMap[cp.id] === undefined) gridStartMap[cp.id] = 0;
   });
 
-  // Build race players
+  // Build race players — store startGridPos for post-race gain/loss display
   RS.racePlayers = CS.players.map(cp => ({
-    id:          cp.id,
-    name:        cp.name,
-    number:      cp.number,
-    teamId:      cp.teamId,
-    position:    gridStartMap[cp.id],
-    lap:         1,
-    finished:    false,
-    crashed:     false,
-    finishRank:  null,
+    id:           cp.id,
+    name:         cp.name,
+    number:       cp.number,
+    teamId:       cp.teamId,
+    position:     gridStartMap[cp.id],
+    startGridPos: gridStartMap[cp.id], // saved once, never updated
+    startGridRank: null,               // 1-based grid rank (set below)
+    lap:          1,
+    finished:     false,
+    crashed:      false,
+    finishRank:   null,
   }));
+
+  // Assign 1-based grid ranks (rank 1 = furthest ahead = pole sitter)
+  const byStartDesc = [...RS.racePlayers].sort((a, b) => b.startGridPos - a.startGridPos);
+  byStartDesc.forEach((rp, i) => { rp.startGridRank = i + 1; });
 
   // Turn order in race = qualifying order (pole goes first)
   RS.turnOrder = [...qualOrder];
@@ -1791,13 +1797,20 @@ function showRaceResultModal(circuitIdx, finishOrder, crashedIds = []) {
     const cp   = CS.players.find(p => p.id === pid);
     const team = TEAMS.find(t => t.id === cp.teamId);
     const pts  = POINTS_TABLE[i] || 0;
+    const rp   = RS.racePlayers.find(p => p.id === pid);
+    const startRank = rp?.startGridRank ?? '?';
+    const delta = rp ? (rp.startGridRank - pos) : 0; // positive = gained positions
+    const deltaStr = delta > 0 ? `<span class="pos-gain">▲${delta}</span>`
+                   : delta < 0 ? `<span class="pos-loss">▼${Math.abs(delta)}</span>`
+                   : `<span class="pos-same">●0</span>`;
     const row  = document.createElement('div');
     row.className = 'finish-row';
     row.innerHTML = `
       <div class="finish-row-pos ${pos<=3?'pos-'+pos:''}">${pos}</div>
       <div class="finish-row-dot" style="background:${team.color}"></div>
       <div class="finish-row-name">${cp.name}</div>
-      <div class="finish-row-team">${team.name.toUpperCase()}</div>
+      <div class="finish-row-start">P${startRank}</div>
+      <div class="finish-row-delta">${deltaStr}</div>
       <div class="finish-row-pts">+${pts}</div>`;
     fullEl.appendChild(row);
   });
@@ -1805,14 +1818,17 @@ function showRaceResultModal(circuitIdx, finishOrder, crashedIds = []) {
   crashedIds.forEach(pid => {
     const cp   = CS.players.find(p => p.id === pid);
     const team = TEAMS.find(t => t.id === cp.teamId);
+    const rp   = RS.racePlayers.find(p => p.id === pid);
+    const startRank = rp?.startGridRank ?? '?';
     const row  = document.createElement('div');
     row.className = 'finish-row finish-row-crash';
     row.innerHTML = `
       <div class="finish-row-pos" style="color:#ff4444">💥</div>
       <div class="finish-row-dot" style="background:${team.color};opacity:0.5"></div>
       <div class="finish-row-name" style="opacity:0.6;text-decoration:line-through">${cp.name}</div>
-      <div class="finish-row-team" style="opacity:0.5">${team.name.toUpperCase()}</div>
-      <div class="finish-row-pts" style="color:#ff4444">CRASH</div>`;
+      <div class="finish-row-start" style="opacity:0.5">P${startRank}</div>
+      <div class="finish-row-delta"><span class="pos-loss">CRASH</span></div>
+      <div class="finish-row-pts" style="color:#ff4444">0</div>`;
     fullEl.appendChild(row);
   });
 

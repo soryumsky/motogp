@@ -335,15 +335,21 @@ html, body { width:100%; height:100%; overflow:hidden; font-family:'Rajdhani',sa
 
 /* Full standings */
 .finish-full-standings { display:flex; flex-direction:column; gap:3px; margin-bottom:20px; text-align:left; }
-.finish-row { display:grid; grid-template-columns:26px 12px 1fr auto auto; align-items:center; gap:8px; padding:7px 10px; background:var(--bg-card2); border-radius:6px; border:1px solid var(--border); font-size:12px; }
+.finish-row { display:grid; grid-template-columns:26px 12px 1fr 32px 44px 44px; align-items:center; gap:6px; padding:7px 10px; background:var(--bg-card2); border-radius:6px; border:1px solid var(--border); font-size:12px; }
 .finish-row-pos { font-family:'Orbitron',sans-serif; font-size:10px; font-weight:700; color:var(--text-dim); text-align:center; }
 .finish-row-pos.pos-1 { color:#ffd700; }
 .finish-row-pos.pos-2 { color:#c0c0c0; }
 .finish-row-pos.pos-3 { color:#cd7f32; }
 .finish-row-dot { width:10px; height:10px; border-radius:50%; }
 .finish-row-name { font-weight:700; }
-.finish-row-team { font-size:10px; color:var(--text-secondary); font-weight:600; }
+.finish-row-start { font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--text-secondary); text-align:center; }
+.finish-row-delta { font-family:'Share Tech Mono',monospace; font-size:11px; font-weight:700; text-align:center; }
 .finish-row-pts { font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--accent); font-weight:700; text-align:right; }
+
+/* Position gain / loss / same indicators */
+.pos-gain { color:#4cdf7a; }
+.pos-loss { color:#ff5555; font-size:10px; }
+.pos-same { color:var(--text-dim); }
 
 .result-actions { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
 .btn-next-circuit { display:inline-flex; align-items:center; gap:8px; padding:12px 28px; background:linear-gradient(135deg,var(--accent2),#cc2200); border:none; border-radius:8px; font-family:'Orbitron',sans-serif; font-size:12px; font-weight:700; letter-spacing:.1em; color:#fff; cursor:pointer; transition:all .2s; box-shadow:0 4px 20px rgba(255,77,0,.35); }
@@ -575,9 +581,10 @@ html, body { width:100%; height:100%; overflow:hidden; font-family:'Rajdhani',sa
     gap: 2px;
     margin-bottom: 0;
   }
-  .finish-row { padding: 4px 7px; font-size: 11px; grid-template-columns: 22px 10px 1fr auto auto; gap: 5px; }
+  .finish-row { padding: 4px 7px; font-size: 11px; grid-template-columns: 22px 10px 1fr 26px 36px 34px; gap: 4px; }
   .finish-row-pos { font-size: 9px; }
-  .finish-row-team { display: none; } /* hide team name to fit */
+  .finish-row-start { font-size: 9px; }
+  .finish-row-delta { font-size: 10px; }
   .finish-row-pts { font-size: 10px; }
 
   /* Actions — full width bottom */
@@ -630,7 +637,39 @@ html, body { width:100%; height:100%; overflow:hidden; font-family:'Rajdhani',sa
   /* Make sidebar scrollable if content overflows */
   .sidebar { overflow: hidden; }
   .standings-card { min-height: 0; }
-  .log-card { min-height: 0; }
+
+  /* Hide race log entirely in landscape — reclaim vertical space */
+  .log-card { display: none !important; }
+
+  /* Keep champ-mini visible but give it proper scroll */
+  .champ-mini-card { min-height: 0; flex: 1; }
+}
+
+/* ───────────────────────────────────────────
+   FIX: game-header must never be hidden
+   Some phones clip fixed/sticky bars under
+   browser chrome in landscape.
+─────────────────────────────────────────── */
+@media (orientation: landscape) and (max-height: 600px) {
+  #game-screen,
+  #qualifying-screen {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100dvh;            /* use dvh so browser chrome is excluded */
+    overflow: hidden;
+  }
+  .game-header {
+    position: relative;
+    z-index: 20;
+    flex-shrink: 0;
+    /* Prevent browser from scrolling it away */
+    top: 0;
+  }
+  .game-layout {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
 }
 
 #qualifying-screen { overflow:hidden; }
