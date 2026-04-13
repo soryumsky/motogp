@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MotoGP World Championship</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════
+       HOME SCREEN
+  ══════════════════════════════════════════ -->
+  <div id="home-screen" class="screen active">
+    <div class="setup-bg"><div class="setup-lines"></div></div>
+    <div class="home-container">
+      <div class="logo-wrap">
+        <span class="logo-icon">🏁</span>
+        <h1 class="logo-title">MOTOGP</h1>
+        <span class="logo-subtitle">WORLD CHAMPIONSHIP</span>
+      </div>
+      <div class="home-buttons">
+        <button class="btn-home" id="btn-new-game">
+          <span class="btn-home-icon">🚀</span>
+          <div>
+            <div class="btn-home-label">NEW GAME</div>
+            <div class="btn-home-sub">Mulai championship baru</div>
+          </div>
+        </button>
+        <button class="btn-home btn-home-secondary" id="btn-load-game">
+          <span class="btn-home-icon">📂</span>
+          <div>
+            <div class="btn-home-label">LOAD GAME</div>
+            <div class="btn-home-sub">Lanjutkan championship</div>
+          </div>
+        </button>
+      </div>
+      <div id="saved-games-list" class="saved-games-panel hidden"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SETUP SCREEN
+  ══════════════════════════════════════════ -->
+  <div id="setup-screen" class="screen">
+    <div class="setup-bg"><div class="setup-lines"></div></div>
+    <div class="setup-container">
+      <div class="setup-header">
+        <button class="btn-back" id="btn-back-home">← BACK</button>
+        <div class="logo-wrap" style="margin-top:0">
+          <span class="logo-icon" style="font-size:32px">🏁</span>
+          <h1 class="logo-title" style="font-size:clamp(28px,4vw,52px)">NEW CHAMPIONSHIP</h1>
+        </div>
+        <p class="setup-desc">Daftarkan 10 pemain — <strong>15 sirkuit</strong> menanti</p>
+      </div>
+      <div class="teams-grid" id="teams-grid"></div>
+      <div class="setup-footer">
+        <button id="start-btn" class="btn-start" disabled>
+          <span class="btn-icon">🚀</span>
+          <span>START CHAMPIONSHIP</span>
+        </button>
+        <p class="setup-hint">Isi semua nama pemain dan nomor motor untuk memulai</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       QUALIFYING SCREEN
+  ══════════════════════════════════════════ -->
+  <div id="qualifying-screen" class="screen">
+    <header class="game-header">
+      <div class="header-left">
+        <div class="qual-badge">⏱ QUALIFYING</div>
+      </div>
+      <div class="header-center">
+        <div class="circuit-name" id="qual-circuit-name">—</div>
+        <div class="header-meta">
+          <span class="meta-item">Ronde <span id="qual-circuit-round">1</span>/<span id="qual-circuit-total">15</span></span>
+          <span class="meta-sep">|</span>
+          <span class="meta-item">🔄 1 LAP</span>
+          <span class="meta-sep">|</span>
+          <span class="meta-item">📦 <span id="qual-total-boxes">40</span> KOTAK</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="dice-display" id="qual-dice-display">
+          <div class="dice-face" id="qual-dice-face">⏱</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="game-layout">
+      <aside class="sidebar">
+        <div class="sidebar-card turn-card">
+          <div class="card-title">GILIRAN KUALIFIKASI</div>
+          <div class="current-turn" id="qual-current-turn-display"></div>
+          <button id="qual-roll-btn" class="btn-roll btn-roll-qual">
+            <span class="roll-icon">⏱</span><span>LEMPAR DADU</span>
+          </button>
+        </div>
+        <div class="sidebar-card standings-card">
+          <div class="card-title">HASIL KUALIFIKASI</div>
+          <div class="standings-list" id="qual-standings-list"></div>
+        </div>
+        <div class="sidebar-card log-card">
+          <div class="card-title">QUALIFYING LOG</div>
+          <div class="race-log" id="qual-race-log"></div>
+        </div>
+      </aside>
+      <main class="circuit-area">
+        <div class="circuit-wrapper" id="qual-circuit-wrapper"></div>
+      </main>
+    </div>
+
+    <!-- Qualifying Result Modal -->
+    <div id="qual-result-overlay" class="finish-overlay hidden">
+      <div class="finish-modal">
+        <div class="finish-header">
+          <span class="finish-trophy">⏱</span>
+          <h2 class="finish-title">QUALIFYING SELESAI!</h2>
+          <div class="finish-circuit" id="qual-result-circuit-name"></div>
+        </div>
+        <div class="qual-result-desc">Grid start dan turn order race telah ditentukan oleh hasil kualifikasi</div>
+        <div class="finish-full-standings" id="qual-finish-standings"></div>
+        <div class="result-actions">
+          <button id="qual-start-race-btn" class="btn-next-circuit">🏁 MULAI RACE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       GAME SCREEN
+  ══════════════════════════════════════════ -->
+  <div id="game-screen" class="screen">
+    <header class="game-header">
+      <div class="header-left">
+        <button id="exit-btn" class="btn-exit">☰ MENU</button>
+      </div>
+      <div class="header-center">
+        <div class="circuit-name" id="circuit-name">—</div>
+        <div class="header-meta">
+          <span class="meta-item">Ronde <span id="circuit-round">1</span>/<span id="circuit-total">15</span></span>
+          <span class="meta-sep">|</span>
+          <span class="meta-item">🔄 <span id="total-laps">5</span> LAP</span>
+          <span class="meta-sep">|</span>
+          <span class="meta-item">📦 <span id="total-boxes">40</span> KOTAK</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="dice-display" id="dice-display">
+          <div class="dice-face" id="dice-face">🎲</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="game-layout">
+      <aside class="sidebar">
+        <div class="sidebar-card turn-card">
+          <div class="card-title">GILIRAN</div>
+          <div class="current-turn" id="current-turn-display"></div>
+          <button id="roll-btn" class="btn-roll">
+            <span class="roll-icon">🎲</span><span>LEMPAR DADU</span>
+          </button>
+        </div>
+        <div class="sidebar-card standings-card">
+          <div class="card-title">KLASEMEN RACE</div>
+          <div class="standings-list" id="standings-list"></div>
+        </div>
+        <div class="sidebar-card champ-mini-card">
+          <div class="card-title">CHAMPIONSHIP PTS</div>
+          <div class="champ-mini-list" id="champ-mini-list"></div>
+        </div>
+        <div class="sidebar-card log-card">
+          <div class="card-title">RACE LOG</div>
+          <div class="race-log" id="race-log"></div>
+        </div>
+      </aside>
+      <main class="circuit-area">
+        <div class="circuit-wrapper" id="circuit-wrapper"></div>
+      </main>
+    </div>
+
+    <!-- Race Result Modal -->
+    <div id="race-result-overlay" class="finish-overlay hidden">
+      <div class="finish-modal">
+        <div class="finish-header">
+          <span class="finish-trophy">🏆</span>
+          <h2 class="finish-title">RACE SELESAI!</h2>
+          <div class="finish-circuit" id="race-result-circuit-name"></div>
+        </div>
+        <div class="race-result-pts" id="race-result-pts"></div>
+        <div class="finish-podium" id="finish-podium"></div>
+        <div class="finish-full-standings" id="finish-full-standings"></div>
+        <div class="result-actions">
+          <button id="next-circuit-btn" class="btn-next-circuit">🏁 NEXT CIRCUIT</button>
+          <button id="view-championship-btn" class="btn-view-champ">📊 KLASEMEN</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       CHAMPIONSHIP SCREEN
+  ══════════════════════════════════════════ -->
+  <div id="championship-screen" class="screen">
+    <header class="game-header">
+      <div class="header-left">
+        <button id="champ-back-btn" class="btn-exit">← BACK</button>
+      </div>
+      <div class="header-center">
+        <div class="circuit-name" id="champ-title">WORLD CHAMPIONSHIP</div>
+        <div class="header-meta">
+          <span class="meta-item" id="champ-progress-label"></span>
+        </div>
+      </div>
+      <div class="header-right"></div>
+    </header>
+    <div class="champ-layout">
+      <div class="champ-section">
+        <div class="champ-section-title">🏎️ DRIVER STANDINGS</div>
+        <div id="driver-standings"></div>
+      </div>
+      <div class="champ-section">
+        <div class="champ-section-title">🏭 CONSTRUCTOR STANDINGS</div>
+        <div id="constructor-standings"></div>
+        <div class="champ-section-title" style="margin-top:28px">📅 CIRCUIT RESULTS</div>
+        <div id="circuit-results-list"></div>
+      </div>
+    </div>
+    <!-- Final championship trophy banner (only when all circuits done) -->
+    <div id="final-champion-banner" class="final-banner hidden"></div>
+    <div class="champ-footer" id="champ-footer"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
