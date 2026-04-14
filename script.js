@@ -1064,7 +1064,7 @@ function onQualifyingFinished() {
       <div class="finish-row-pos ${pos<=3?'pos-'+pos:''}">${pos}</div>
       <div class="finish-row-dot" style="background:${team.color}"></div>
       <div class="finish-row-name">${cp.name}</div>
-      <div class="finish-row-team">${team.name.toUpperCase()}</div>
+      <div class="finish-row-team"></div>
       <div class="finish-row-pts" style="color:${pos===1?'#ffd700':'var(--text-secondary)'}">${pos===1?'🟡 POLE':pos===2?'FRONT ROW':pos<=3?'2ND ROW':'P'+pos}</div>`;
     fullEl.appendChild(row);
   });
