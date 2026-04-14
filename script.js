@@ -1030,10 +1030,16 @@ function advanceQualTurn() {
 }
 
 function updateQualRollButton() {
-  document.getElementById('qual-roll-btn').disabled = QS.isRolling || QS.gameOver;
+  const btn = document.getElementById('qual-roll-btn');
+  if (!btn) return;
+  btn.disabled = QS.isRolling || QS.gameOver;
+
+  // Auto-advance: delay before next turn so animation is visible
   const activeCount = QS.qualPlayers.filter(p => !p.finished).length;
-  if (activeCount > 0) {
-    handleQualTurn();
+  if (activeCount > 0 && !QS.isRolling && !QS.gameOver) {
+    setTimeout(() => {
+      if (!QS.isRolling && !QS.gameOver) handleQualTurn();
+    }, 300);
   }
 }
 
@@ -1447,16 +1453,20 @@ function renderRaceStandings() {
 
 function renderChampMini() {
   const list = document.getElementById('champ-mini-list');
+  if (!list) return;
   list.innerHTML = '';
   const sorted = [...CS.players].sort((a, b) => b.totalPts - a.totalPts);
+  const leaderPts = sorted[0]?.totalPts || 0;
   sorted.forEach((cp, i) => {
     const team = TEAMS.find(t => t.id === cp.teamId);
+    const gap  = i === 0 ? '' : `-${leaderPts - cp.totalPts}`;
     const row  = document.createElement('div');
-    row.className = 'champ-mini-row';
+    row.className = 'champ-mini-row' + (i === 0 ? ' champ-mini-leader' : '');
     row.innerHTML = `
-      <div class="champ-mini-pos">${i+1}</div>
+      <div class="champ-mini-pos ${i < 3 ? 'pos-' + (i+1) : ''}">${i+1}</div>
       <div class="champ-mini-dot" style="background:${team.color}"></div>
       <div class="champ-mini-name">${cp.name}</div>
+      <div class="champ-mini-gap">${gap}</div>
       <div class="champ-mini-pts">${cp.totalPts}</div>`;
     list.appendChild(row);
   });
@@ -1698,12 +1708,16 @@ function advanceTurn() {
 }
 
 function updateRollButton() {
-  document.getElementById('roll-btn').disabled = RS.isRolling || RS.gameOver;
+  const btn = document.getElementById('roll-btn');
+  if (!btn) return;
+  btn.disabled = RS.isRolling || RS.gameOver;
 
-  // automaticly
+  // Auto-advance: delay before next turn so animation is visible
   const activeCount = RS.racePlayers.filter(p => !p.finished && !p.crashed).length;
-  if(activeCount > 0){
-    handleTurn();
+  if (activeCount > 0 && !RS.isRolling && !RS.gameOver) {
+    setTimeout(() => {
+      if (!RS.isRolling && !RS.gameOver) handleTurn();
+    }, 300);
   }
 }
 
@@ -2161,11 +2175,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── CHAMPIONSHIP ──
   document.getElementById('champ-back-btn').addEventListener('click', () => {
-    // If in middle of championship, go back to game if race in progress
+    // If in middle of championship, go back to game screen with result modal visible
     if (CS.currentCircuit > 0 && CS.currentCircuit <= TOTAL_CIRCUITS) {
-      // If last race was just finished and we're viewing standings, go back to result
-      const overlay = document.getElementById('race-result-overlay');
       showScreen('game-screen');
+      // Re-show the race result overlay if it was dismissed to view standings
+      const overlay = document.getElementById('race-result-overlay');
+      overlay.classList.remove('hidden');
     } else {
       renderHome();
     }
