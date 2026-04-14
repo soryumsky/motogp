@@ -1030,16 +1030,10 @@ function advanceQualTurn() {
 }
 
 function updateQualRollButton() {
-  const btn = document.getElementById('qual-roll-btn');
-  if (!btn) return;
-  btn.disabled = QS.isRolling || QS.gameOver;
-
-  // Auto-advance: delay before next turn so animation is visible
+  document.getElementById('qual-roll-btn').disabled = QS.isRolling || QS.gameOver;
   const activeCount = QS.qualPlayers.filter(p => !p.finished).length;
-  if (activeCount > 0 && !QS.isRolling && !QS.gameOver) {
-    setTimeout(() => {
-      if (!QS.isRolling && !QS.gameOver) handleQualTurn();
-    }, 300);
+  if (activeCount > 0) {
+    handleQualTurn();
   }
 }
 
@@ -1453,20 +1447,16 @@ function renderRaceStandings() {
 
 function renderChampMini() {
   const list = document.getElementById('champ-mini-list');
-  if (!list) return;
   list.innerHTML = '';
   const sorted = [...CS.players].sort((a, b) => b.totalPts - a.totalPts);
-  const leaderPts = sorted[0]?.totalPts || 0;
   sorted.forEach((cp, i) => {
     const team = TEAMS.find(t => t.id === cp.teamId);
-    const gap  = i === 0 ? '' : `-${leaderPts - cp.totalPts}`;
     const row  = document.createElement('div');
-    row.className = 'champ-mini-row' + (i === 0 ? ' champ-mini-leader' : '');
+    row.className = 'champ-mini-row';
     row.innerHTML = `
-      <div class="champ-mini-pos ${i < 3 ? 'pos-' + (i+1) : ''}">${i+1}</div>
+      <div class="champ-mini-pos">${i+1}</div>
       <div class="champ-mini-dot" style="background:${team.color}"></div>
       <div class="champ-mini-name">${cp.name}</div>
-      <div class="champ-mini-gap">${gap}</div>
       <div class="champ-mini-pts">${cp.totalPts}</div>`;
     list.appendChild(row);
   });
@@ -1708,16 +1698,12 @@ function advanceTurn() {
 }
 
 function updateRollButton() {
-  const btn = document.getElementById('roll-btn');
-  if (!btn) return;
-  btn.disabled = RS.isRolling || RS.gameOver;
+  document.getElementById('roll-btn').disabled = RS.isRolling || RS.gameOver;
 
-  // Auto-advance: delay before next turn so animation is visible
+  // automaticly
   const activeCount = RS.racePlayers.filter(p => !p.finished && !p.crashed).length;
-  if (activeCount > 0 && !RS.isRolling && !RS.gameOver) {
-    setTimeout(() => {
-      if (!RS.isRolling && !RS.gameOver) handleTurn();
-    }, 300);
+  if(activeCount > 0){
+    handleTurn();
   }
 }
 
